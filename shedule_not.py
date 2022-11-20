@@ -8,9 +8,9 @@ bogota_time_zone = pytz.timezone('America/Bogota')
 
 def execute_in_the_future(days_in_the_furture,f_hour,f_minute):
     """The function takes the current time, and calculates for how many seconds should sleep until a user provided minute in the future."""       
-    t = datetime.today()
-    future = datetime(t.year,t.month,t.day + days_in_the_furture,f_hour,f_minute)
-    if future.minute <= t.minute or future.hour < t.hour:
+    t = datetime.now(bogota_time_zone)
+    future = bogota_time_zone.localize(datetime(t.year,t.month,t.day + days_in_the_furture,f_hour,f_minute))
+    if future == t:
         print("ERROR! Enter a valid time in the future.")
     else:
         print (f"Current time: {t.day} : {t.hour} : {t.minute}")
@@ -21,7 +21,7 @@ def execute_in_the_future(days_in_the_furture,f_hour,f_minute):
         start_sending()
 
 if __name__ == "__main__":
-    execute_in_the_future(0,15,50)
+    execute_in_the_future(0,16,8)
     while True:
        execute_in_the_future(1,7,30)
     
