@@ -26,8 +26,10 @@ def send_messages(bogota_date):
     for user_id in users_id:
         send_message(message,user_id,TOKEN)
 
-if __name__ == "__main__" :
+def start_sending():
     bogota_time_zone = pytz.timezone('America/Bogota')
     bogota_date = datetime.now(bogota_time_zone).strftime("%d-%m-%Y") 
 
     send_messages(bogota_date)
+if __name__ == "__main__" :
+    start_sending()
