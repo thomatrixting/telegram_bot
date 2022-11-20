@@ -13,7 +13,7 @@ from telegram.ext.filters import Filters
 from os import path
 from datetime import datetime
 import pytz #mange times zones
-from functions import process_df,add_row_to_file,read_users_id
+from functions import process_df,add_row_to_file,read_users_id,get_pasword
 
 #inicilizate the bot 
 defaults = Defaults(parse_mode ='MarkdownV2')
@@ -28,6 +28,7 @@ bogota_date = datetime.now(bogota_time_zone).strftime("%d-%m-%Y")
 root = path.dirname(path.abspath(__file__))
 df_path = path.join(root, 'df.txt')
 users_path = path.join(root, 'users.txt')
+file_path = path.join(root, 'file.txt')
 
 log_in_open = False
 
@@ -36,8 +37,16 @@ def start(update: Update, context: CallbackContext):
 
 def notification(update: Update, context: CallbackContext):
    #you need to fix the encoding problem
-    message = process_df(df_path,bogota_date)
-    update.message.reply_text(message)
+    try:
+        message = process_df(df_path,bogota_date)
+        update.message.reply_text(message)
+    except Exception as e:
+        update.message.reply_text('error in notification')
+        print(f"""
+        message: {message}
+        ---------
+        error: {e}
+        """)
 
 def log_in(update: Update, context: CallbackContext):
     message = "send pasword: "
@@ -50,25 +59,25 @@ def log_in_data_reciver(update: Update, context: CallbackContext):
     input_recived = str.lower(input_recived)
     global log_in_open
 
+    pasword = get_pasword(file_path)
 
-    if input_recived == "tqm" and log_in_open:
+    if input_recived == pasword and log_in_open:
 
-        chat_id = update.effective_user.id
+        chat_id = str(update.effective_user.id)
         users_id = read_users_id(users_path)
         
-        if not users_id in users_id:
-            add_row_to_file(users_path,str(chat_id))
+        if not chat_id in users_id:
+            add_row_to_file(users_path,chat_id)
+        else:
+            update.message.reply_text('already in sytem')
 
-        update.message.reply_text('updated')
+        update.message.reply_text('updated\.')
         notification(update,context)
 
         log_in_open = False
         
     else:
         update.message.reply_text('i don\'t understand')
-
-
-
 
 ##set responses
 dp = updater.dispatcher
